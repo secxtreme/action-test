@@ -1,0 +1,3 @@
+This is main version 1.0-alpha-dev.
+
+The action should replace version 1.0-alpha-dev by a tagged version, e.g. 1.1-alpha.
