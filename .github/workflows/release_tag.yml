@@ -6,7 +6,7 @@ name: Release bundle
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    tags: [ "1.*-alpha*-draft", "1.*-beta*-draft" ]
+    tags: [ "1.*-alpha*", "1.*-beta*" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
 
       - name: Get new tag
         id: tag
-        run: echo "::set-output name=new::$(echo "${{ github.ref_name }}" | sed -e 's/-draft$//g')"
+        run: echo "::set-output name=new::$(echo "${{ github.ref_name }}" | sed -e 's/^\(.*-\(alpha\|beta\)\).*$/\1'"-${{ steps.ts.outputs.now }}"'/g')"
 
       - name: Set version
         run: sh set_version.sh "${{ steps.ts.outputs.now }}"
