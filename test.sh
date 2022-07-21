@@ -1,10 +1,6 @@
 #!/bin/sh
 
-if true; then
-  echo "Environment begin"
-  env
-  echo "Environment end"
-fi
+echo "Test running in $PWD"
 
 x=1
 
