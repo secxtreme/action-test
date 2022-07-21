@@ -32,7 +32,7 @@ jobs:
         run: echo "::set-output name=new::$(echo "${{ github.ref_name }}" | sed -e 's/^\(.*-\(alpha\|beta\)\).*$/\1'"-${{ steps.ts.outputs.now }}"'/g')"
 
       - name: Set version
-        run: sh set_version.sh "${{ steps.ts.outputs.now }}"
+        run: sh set_version.sh "${{ steps.tag.outputs.new }}"
 
       - name: Run test script
         run: sh test.sh
