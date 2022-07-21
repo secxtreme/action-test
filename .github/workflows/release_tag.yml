@@ -28,7 +28,7 @@ jobs:
         run: echo "::set-output name=now::$(date +%Y%m%dT%H%M%S)"
 
       - name: Set version
-        run: sh set_version.sh "${{ steps.ts.output.now }}"
+        run: sh set_version.sh "${{ steps.ts.outputs.now }}"
 
       - name: Run test script
         run: sh test.sh
