@@ -5,8 +5,8 @@ name: Release bundle
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    tags: [ "1.*-alpha*", "1.*-beta*" ]
+  release:
+    types: [created]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -23,16 +23,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: Get timestamp
-        id: ts
-        run: echo "::set-output name=now::$(date +%Y%m%dT%H%M%S)"
-
-      - name: Get new tag
-        id: tag
-        run: echo "::set-output name=new::$(echo "${{ github.ref_name }}" | sed -e 's/^\(.*-\(alpha\|beta\)\).*$/\1'"-${{ steps.ts.outputs.now }}"'/g')"
-
       - name: Set version
-        run: sh set_version.sh "${{ steps.tag.outputs.new }}"
+        run: sh set_version.sh "${{ github.ref_name }}"
 
       - name: Run test script
         run: sh test.sh
@@ -42,22 +34,12 @@ jobs:
           tar -czf archive.tar.gz main.txt src/
           sha256sum archive.tar.gz > archive.tar.gz.sha256
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.tag.outputs.new }}
-          release_name: Release ${{ steps.tag.outputs.new }}
-          draft: false
-          prerelease: true
       - name: Upload artifact bundle
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./archive.tar.gz
           asset_name: archive.tar.gz
           asset_content_type: application/gzip
@@ -66,7 +48,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./archive.tar.gz.sha256
           asset_name: archive.tar.gz.sha256
           asset_content_type: plain/text
