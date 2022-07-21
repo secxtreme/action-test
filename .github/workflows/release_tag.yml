@@ -6,7 +6,7 @@ name: Release bundle
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    tags: [ "1.*-alpha*", "1.*-beta*" ]
+    tags: [ "1.*-alpha*-draft", "1.*-beta*-draft" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -27,6 +27,10 @@ jobs:
         id: ts
         run: echo "::set-output name=now::$(date +%Y%m%dT%H%M%S)"
 
+      - name: Get new tag
+        id: tag
+        run: echo "::set-output name=new::$(echo "${{ github.ref_name }}" | sed -e 's/-draft$//g')"
+
       - name: Set version
         run: sh set_version.sh "${{ steps.ts.outputs.now }}"
 
@@ -44,8 +48,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          tag_name: ${{ steps.tag.outputs.new }}
+          release_name: Release ${{ steps.tag.outputs.new }}
           draft: false
           prerelease: true
       - name: Upload artifact bundle
